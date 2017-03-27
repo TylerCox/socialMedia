@@ -1,0 +1,139 @@
+<html>
+<head>
+<meta http-equiv='Access-Control-Allow-Origin' content='*'>
+<header name='Access-Control-Allow-Origin' value='*'>
+<link rel="stylesheet" href="bootstrap-3.3.7/css/bootstrap.min.css">
+<link rel="stylesheet" href="font-awesome-4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="style.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
+<script type="text/javascript" async src="https://platform.twitter.com/widgets.js"></script>
+<script src="app.js"></script>
+</head>
+<body ng-app="mediaApp">
+<div ng-controller="mainControl">
+	<div id='menu' class="navbar navbar-inverse navbar-static-top" role="navigation">
+		<div class='container'>
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+					<span class="sr-only">Toggle navigation</span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+			</div>
+			<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+				<ul class="nav navbar-nav">
+					<li>
+							<a ng-click="requestRefresh()">Refresh</a>
+							<a ng-hide="autoRefresh || refreshing" ng-click='autoRefresh = !autoRefresh'><i class="fa fa-refresh" aria-hidden="true"></i></a>
+							<a ng-show="autoRefresh || refreshing"  ng-click='autoRefresh = !autoRefresh'><i class="fa fa-refresh fa-spin fa-fw" aria-hidden="true"></i></a>
+							<a ng-hide="longList" ng-click='longList = !longList'><i ng-hide="longLists" class="fa fa-minus-square-o" aria-hidden="true"></i></a>
+							<a ng-show="longList" ng-click='longList = !longList'><i class="fa fa-plus-square-o" aria-hidden="true"></i></a>
+					</li>
+					<li>
+						<a><input type='text' ng-model='filter' placeholder='Filter' /></a>
+					</li>
+					<li>
+						<a onclick="$('#introModal').modal('show')">Help</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+	
+	<div id='content' class='container'>
+		<div class='activity' ng-repeat="activity in mediaList" class='row'>
+			<div class='activityHead'>
+				<div class='row'>
+					<div class='col-xs-8'>
+						<h3>
+							<a href='{{activity.actor_url}}' target='_blank'><i title='{{activity.provider}}' class="fa {{selectIcon(activity.provider)}}"></i> {{activity.actor_name}}: {{activity.actor_username}}</a>
+						</h3>
+						<br/>
+						<div class='activityMeta'>
+							{{activity.activity_date}} 
+							<a ng-if='activity.activity_latitude && activity.activity_longitude' href='https://www.google.com/maps/@{{activity.activity_latitude}},{{activity.activity_longitude}},15z' target='_blank'>
+								<i class="fa fa-map-pin" aria-hidden="true"></i>
+							</a>
+						</div>
+						<br/>
+						<div class='activityMeta'>
+							{{activity.activity_likes}} 
+								<a href={{mediaLink(activity,'like')}} target='_blank'>
+									<i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
+								</a>
+						</div>
+						<div class='activityMeta'>
+							{{activity.activity_shares}} 
+								<a href={{mediaLink(activity,'share')}} target='_blank'>
+									<i class="fa fa-comments-o" aria-hidden="true"></i>
+								</a>
+						</div>
+						<div class='activityMeta'>
+							<a href={{mediaLink(activity,'reply')}} target='_blank'>
+								<i class="fa fa-reply" aria-hidden="true"></i>
+							</a>
+						</div>
+						<div class='activityMeta'>
+							Sentiment: 
+							<i ng-if='activity.activity_sentiment == 0' class="fa fa-circle-o" aria-hidden="true"></i>
+							<i ng-if='activity.activity_sentiment == -1' class="fa fa-arrow-down" aria-hidden="true"></i>
+							<i ng-if='activity.activity_sentiment == 1' class="fa fa-arrow-up" aria-hidden="true"></i>
+						</div>
+						<div class='activityMeta'>
+							<a href='{{activity.activity_url}}' target='_blank'><i class="fa fa-window-restore" aria-hidden="true"></i></a>
+						</div>
+					</div>
+					<div class='col-xs-4 avatar'>
+						<img src='{{activity.actor_avator}}'>
+					</div>
+					<div style='clear:both;'></div>
+				</div>
+			</div>
+			<div class='container'>
+				<div class='col-xs-12'>
+					<h4>{{activity.actor_description}}</h4>
+				</div>
+				<div class='col-xs-12' ng-if="activity.activity_attachment_type && activity.activity_attachment_type.includes('image')">
+					<img src='{{activity.activity_attachment}}'>
+				</div>
+				<div class='col-xs-12' ng-if="!activity.activity_message.includes('http')">
+					<p>{{activity.activity_message}}</p>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<div id='introModal' class='modal fade'>
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-body">
+					<h2>First time here?</h2>
+					<p>
+						Here are a few tips
+					</p>
+					<ul>
+						<li>
+							To turn on or off the feed auto update, press the <a ng-hide="autoRefresh"><i class="fa fa-refresh" aria-hidden="true"></i></a>
+							<a ng-show="autoRefresh"><i class="fa fa-refresh fa-spin fa-fw" aria-hidden="true"></i></a> symbol in the menu. 
+						</li>
+						<li>
+							To keep all the old posts on refresh toggle by pressing <a><i ng-hide="longLists" class="fa fa-minus-square-o" aria-hidden="true"></i></a> and to remove all the old posts on refresh press.
+							<a><i class="fa fa-plus-square-o" aria-hidden="true"></i></a>
+						</li>
+					</ul>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+					<button type="button" class="btn btn-primary" ng-click="noIntro()">Don't Show Again</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+</div>
+
+<script src= "bootstrap-3.3.7/js/bootstrap.min.js"></script>
+</body>
+</html>
