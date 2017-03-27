@@ -97,11 +97,11 @@ angular.module("mediaApp",[])
 		}
 		function twitterFormat(activity,action){
 			if(action == 'like'){
-				return 'https://twitter.com/intent/like?tweet_id='+activity.id;
+				return '<a href="https://twitter.com/intent/like?tweet_id='+activity.id+'"  target="_blank"></a>';
 			}else if(action == 'share'){
-				return 'https://twitter.com/intent/retweet?tweet_id='+activity.id;
+				return '<a href="https://twitter.com/intent/retweet?tweet_id='+activity.id+'"></a>';
 			}else if(action == 'reply'){
-				return 'https://twitter.com/intent/tweet?in_reply_to='+activity.id;
+				return '<a href="https://twitter.com/intent/tweet?in_reply_to='+activity.id+'"></a>';
 			}
 			return '#';
 		}
@@ -136,6 +136,10 @@ angular.module("mediaApp",[])
 			return '#';
 		}
 		$scope.mediaLink = function(activity,action){
+			var target=null;
+			
+			//Creates the media element
+			//Each element should result with a clickable object.
 			switch(activity.provider){
 				case 'facebook':
 					return facebookFormat(activity,action);
@@ -144,11 +148,25 @@ angular.module("mediaApp",[])
 				case 'tumblr':
 					return tumblrFormat(activity,action);
 				case 'twitter':
-					return twitterFormat(activity,action);
+					target = $(twitterFormat(activity,action));
+					break;
 				case 'reddit':
 					return redditFormat(activity,action);
 				default:
 					return  '#';
+			}
+			//Appends the media element to the body
+			//Sets a click timer, may be nessisary in the case that
+			//Media scripts parse for new items.
+			if(target){
+				//Delete possible old mediaClickTarget
+				$('#mediaClickTarget').remove();
+				target.css('display','none');
+				target[0].id='mediaClickTarget';
+				$('body')[0].appendChild(target[0]);
+				setTimeout(function(){
+					$('#mediaClickTarget')[0].click();
+				},100);
 			}
 		}
 	}

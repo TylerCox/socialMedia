@@ -60,18 +60,18 @@
 						<br/>
 						<div class='activityMeta'>
 							{{activity.activity_likes}} 
-								<a href={{mediaLink(activity,'like')}} target='_blank'>
+								<a ng-click="mediaLink(activity,'like')" target='_blank'>
 									<i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
 								</a>
 						</div>
 						<div class='activityMeta'>
 							{{activity.activity_shares}} 
-								<a href={{mediaLink(activity,'share')}} target='_blank'>
+								<a ng-click="mediaLink(activity,'share')" target='_blank'>
 									<i class="fa fa-comments-o" aria-hidden="true"></i>
 								</a>
 						</div>
 						<div class='activityMeta'>
-							<a href={{mediaLink(activity,'reply')}} target='_blank'>
+							<a ng-click="mediaLink(activity,'reply')" target='_blank'>
 								<i class="fa fa-reply" aria-hidden="true"></i>
 							</a>
 						</div>
